@@ -64,6 +64,7 @@ def doClip(request):
                                                 outputPreviewPath=outputPreviewPath)
         return JsonResponse({'successful': 1, 'message': f'clipFilter task id:{newTask.taskId} successful running'})
     except Exception as e:
+        print(e)
         return JsonResponse({'successful': 0, 'message': 'running failed'})
 
 @csrf_exempt
@@ -81,4 +82,5 @@ def taskResult(request):
         return JsonResponse(data)
 
     except Exception as e:
+        print(e)
         return JsonResponse({'successful': 0, 'message': 'request failed'})

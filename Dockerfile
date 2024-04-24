@@ -14,6 +14,8 @@ WORKDIR /app
 # 复制 entrypoint.sh 到容器中
 COPY ./entrypoint.sh /entrypoint.sh
 
+RUN chmod +x /entrypoint.sh
+
 ## 将requirements复制到容器中的/app
 COPY ./requirements.txt /app
 
