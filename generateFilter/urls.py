@@ -19,5 +19,5 @@ from django.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(('gaussianGenerate.urls', 'gaussianGenerate'), namespace='api')),
+    path('', include(('gaussianGenerate.urls', 'gaussianGenerate'), namespace='api')),
 ]
