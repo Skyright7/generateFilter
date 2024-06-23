@@ -239,6 +239,19 @@ class MiniCLIP(pl.LightningModule):
 modelWeightPath = './model_weight/clip/canonical_pepprclip_4-22-23.ckpt'
 output_base_path = './data/clipOutput'
 
+import requests
+
+def update_progress(task_id, progress):
+    url = f"http://120.211.228.71:60008/drugback/biz/task/progress?id={task_id}&progress={progress}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            print(f"Progress updated successfully: {progress}%")
+        else:
+            print(f"Failed to update progress: {response.status_code}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 def peptide_encoding_preparation(generated_peptides_path,model, alphabet,batch_converter,do_have_GPU):
     de_novo_peptides_df = pd.read_csv(generated_peptides_path)
     de_novo_peptides = de_novo_peptides_df['generated_peptides'].tolist()
@@ -267,6 +280,8 @@ def peptide_encoding_preparation(generated_peptides_path,model, alphabet,batch_c
     return candidate_peptide_dict
 
 def do_clip(target_seq,taskId, generated_peptides_path,peps_per_target):
+    progress = 0
+    update_step = 0
     torch.hub.set_dir('./esm_weight')
     # 加载编码器模型
     model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
@@ -318,6 +333,11 @@ def do_clip(target_seq,taskId, generated_peptides_path,peps_per_target):
         topk_scores = [float(seq_to_score_dict[peptide]) for peptide in topk_peptides]
 
         output_dict.update({name: (topk_peptides, topk_scores)})
+
+        update_step += 1
+        progress = update_step // len(targets) * 100
+        update_progress(taskId, progress)
+
     peptides_df = pd.DataFrame(
         sum([list(zip([key + '_' + str(i) for i in range(peps_per_target)], output_dict[key][0], output_dict[key][1])) \
              for key in output_dict.keys()], []), columns=['name', 'sequence', 'clip_score'])

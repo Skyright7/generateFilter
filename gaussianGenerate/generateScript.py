@@ -6,8 +6,23 @@ import random
 
 output_path = './data/gaussianGenerateOutput'
 
+import requests
+
+def update_progress(task_id, progress):
+    url = f"http://120.211.228.71:60008/drugback/biz/task/progress?id={task_id}&progress={progress}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            print(f"Progress updated successfully: {progress}%")
+        else:
+            print(f"Failed to update progress: {response.status_code}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 def generate_script(task_id,base_file_path,num_base_peps,num_peps_per_base,min_length,max_length,sample_variances_down,sample_variances_up,sample_variances_step):
     sample_variances = range(sample_variances_down,sample_variances_up, sample_variances_step)
+    progress = 0
+    update_step = 0
     n = num_peps_per_base * num_base_peps # 最终生成数
     # 加载数据
     sample_df = pd.read_csv(base_file_path)
@@ -52,6 +67,9 @@ def generate_script(task_id,base_file_path,num_base_peps,num_peps_per_base,min_l
                 predictions = torch.argmax(aa_logits, dim=2).tolist()[0]
                 generated_pep_seq = "".join([aa_toks[i] for i in predictions])
                 generated_peptides.append(generated_pep_seq[1:-1])
+        update_step += 1
+        progress = update_step // len(sampled_peptides) * 100
+        update_progress(task_id,progress)
 
     # -- 生成算法部分结束 --
     df = pd.DataFrame(generated_peptides, columns=['generated_peptides'])
