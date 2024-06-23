@@ -28,7 +28,7 @@ def doGenerate(request):
         sampleVariancesStep = data['sampleVariancesStep']
         out_file_path = generate_script(taskId, dataPath, numBasePeps, numPepsPerBase, minLength, maxLength,
                                         sampleVariancesDown, sampleVariancesUp, sampleVariancesStep)
-        base_dir = '/home/student/lgy/generateFilter'
+        base_dir = '/home/student/disk2T/lgy/generateFilter'
         relative_path = out_file_path
         # 去掉开头的"./"
         if out_file_path.startswith('./'):
@@ -52,7 +52,7 @@ def doClip(request):
         targetSeq = data['targetSeq']
         pepsPerTarget = data['pepsPerTarget']
         out_file_path = do_clip(targetSeq,taskId, peptidesPath,pepsPerTarget)
-        base_dir = '/home/student/lgy/generateFilter'
+        base_dir = '/home/student/disk2T/lgy/generateFilter'
         relative_path = out_file_path
         # 去掉开头的"./"
         if out_file_path.startswith('./'):
